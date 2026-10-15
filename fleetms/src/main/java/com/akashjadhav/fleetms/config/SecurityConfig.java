@@ -15,7 +15,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/vendors/**").permitAll()
                         .anyRequest().permitAll() // We will restrict specific roles in upcoming days
                 );
         return http.build();
