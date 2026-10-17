@@ -1,0 +1,8 @@
+package com.akashjadhav.fleetms.model;
+
+public enum BookingStatus {
+    PENDING,
+    CONFIRMED,
+    CANCELLED,
+    COMPLETED
+}
