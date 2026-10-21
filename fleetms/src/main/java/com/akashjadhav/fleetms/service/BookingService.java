@@ -75,4 +75,12 @@ public class BookingService {
     public List<Booking> getBookingsByCustomer(Long customerId) {
         return bookingRepository.findByCustomerId(customerId);
     }
+
+    public Booking updateBookingStatus(Long bookingId, BookingStatus status) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+
+        booking.setStatus(status);
+        return bookingRepository.save(booking);
+    }
 }

@@ -2,6 +2,7 @@ package com.akashjadhav.fleetms.controller;
 
 import com.akashjadhav.fleetms.dto.BookingRequest;
 import com.akashjadhav.fleetms.model.Booking;
+import com.akashjadhav.fleetms.model.BookingStatus;
 import com.akashjadhav.fleetms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,5 +37,14 @@ public class BookingController {
     public ResponseEntity<List<Booking>> getBookingsByCustomer(@PathVariable Long customerId) {
         List<Booking> bookings = bookingService.getBookingsByCustomer(customerId);
         return ResponseEntity.ok(bookings);
+    }
+
+    // 4. Update booking status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Booking> updateBookingStatus(
+            @PathVariable Long id,
+            @RequestParam BookingStatus status) {
+        Booking updatedBooking = bookingService.updateBookingStatus(id, status);
+        return ResponseEntity.ok(updatedBooking);
     }
 }
