@@ -38,3 +38,4 @@ com.akashjadhav.fleetms
 ├── model          # JPA Entities & Enums (User, VendorProfile, Vehicle, Booking, Payment, Status Enums)
 ├── repository     # Spring Data JPA repositories for database operations
 └── service        # Business logic implementation layer
+```
