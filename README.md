@@ -19,7 +19,7 @@ FleetMS Pro is a robust, enterprise-grade backend REST API built with **Spring B
 
 ## Tech Stack
 
-- **Java 17**
+- **Java 21**
 - **Spring Boot** (Spring Web, Spring Data JPA, Spring Security)
 - **MySQL Database** & Hibernate ORM
 - **Maven** (Dependency Management)
