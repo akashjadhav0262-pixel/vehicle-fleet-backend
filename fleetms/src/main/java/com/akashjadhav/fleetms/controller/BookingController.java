@@ -1,12 +1,15 @@
+
 package com.akashjadhav.fleetms.controller;
 
 import com.akashjadhav.fleetms.dto.BookingRequest;
 import com.akashjadhav.fleetms.model.Booking;
 import com.akashjadhav.fleetms.model.BookingStatus;
+import com.akashjadhav.fleetms.model.User;
 import com.akashjadhav.fleetms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,33 +21,44 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    // 1. Create a new booking
     @PostMapping
-    public ResponseEntity<Booking> createBooking(@RequestBody BookingRequest request) {
-        Booking savedBooking = bookingService.createBooking(request);
+    public ResponseEntity<Booking> createBooking(
+            @RequestBody BookingRequest request,
+            Authentication authentication) {
+
+        User customer = (User) authentication.getPrincipal();
+
+        Booking savedBooking = bookingService.createBooking(request, customer);
+
         return new ResponseEntity<>(savedBooking, HttpStatus.CREATED);
     }
 
-    // 2. Get all bookings in the system
     @GetMapping
     public ResponseEntity<List<Booking>> getAllBookings() {
         List<Booking> bookings = bookingService.getAllBookings();
         return ResponseEntity.ok(bookings);
     }
 
-    // 3. Get bookings for a specific customer
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<Booking>> getBookingsByCustomer(@PathVariable Long customerId) {
-        List<Booking> bookings = bookingService.getBookingsByCustomer(customerId);
+    @GetMapping("/my-bookings")
+    public ResponseEntity<List<Booking>> getMyBookings(
+            Authentication authentication) {
+
+        User customer = (User) authentication.getPrincipal();
+
+        List<Booking> bookings =
+                bookingService.getBookingsByCustomer(customer.getId());
+
         return ResponseEntity.ok(bookings);
     }
 
-    // 4. Update booking status
     @PutMapping("/{id}/status")
     public ResponseEntity<Booking> updateBookingStatus(
             @PathVariable Long id,
             @RequestParam BookingStatus status) {
-        Booking updatedBooking = bookingService.updateBookingStatus(id, status);
+
+        Booking updatedBooking =
+                bookingService.updateBookingStatus(id, status);
+
         return ResponseEntity.ok(updatedBooking);
     }
 }

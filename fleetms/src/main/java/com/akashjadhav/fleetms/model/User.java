@@ -2,6 +2,7 @@ package com.akashjadhav.fleetms.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -17,6 +18,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -27,6 +29,7 @@ public class User {
     @Column(nullable = false)
     private Role role; // CUSTOMER or VENDOR_ADMIN
 
+    @JsonIgnore
     private String resetToken;
 
     private LocalDateTime createdAt = LocalDateTime.now();

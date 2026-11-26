@@ -11,6 +11,7 @@ import com.akashjadhav.fleetms.security.JwtService;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.akashjadhav.fleetms.model.Role;
 
 import java.util.UUID;
 
@@ -41,12 +42,12 @@ public class AuthService {
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
                 request.getPhoneNumber(),
-                request.getRole()
+                Role.CUSTOMER
         );
 
         userRepository.save(user);
 
-        return "User registered successfully as " + request.getRole();
+        return "User registered successfully as CUSTOMER";
     }
 
     public LoginResponse login(LoginRequest request) {

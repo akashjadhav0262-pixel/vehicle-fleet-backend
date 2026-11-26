@@ -1,3 +1,4 @@
+
 package com.akashjadhav.fleetms.service;
 
 import com.akashjadhav.fleetms.dto.BookingRequest;
@@ -6,7 +7,6 @@ import com.akashjadhav.fleetms.model.BookingStatus;
 import com.akashjadhav.fleetms.model.User;
 import com.akashjadhav.fleetms.model.Vehicle;
 import com.akashjadhav.fleetms.repository.BookingRepository;
-import com.akashjadhav.fleetms.repository.UserRepository;
 import com.akashjadhav.fleetms.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,40 +24,51 @@ public class BookingService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public Booking createBooking(BookingRequest request, User customer) {
 
-    public Booking createBooking(BookingRequest request) {
-        // 1. Fetch Customer
-        User customer = userRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + request.getCustomerId()));
-
-        // 2. Fetch Vehicle
+        // 1. Fetch Vehicle
         Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with ID: " + request.getVehicleId()));
+                .orElseThrow(() ->
+                        new RuntimeException("Vehicle not found with ID: "
+                                + request.getVehicleId()));
 
-        // 3. Calculate Rental Duration and Cost
-        Duration duration = Duration.between(request.getStartTime(), request.getEndTime());
+        // 2. Validate Rental Duration
+        Duration duration = Duration.between(
+                request.getStartTime(),
+                request.getEndTime()
+        );
+
         long hours = duration.toHours();
 
         if (hours <= 0) {
-            throw new IllegalArgumentException("End time must be after start time.");
+            throw new IllegalArgumentException(
+                    "End time must be after start time."
+            );
         }
 
+        // 3. Calculate Rental Cost
         BigDecimal totalPrice;
-        // If rental is 24 hours or more, calculate using daily rate; otherwise hourly rate
+
         if (hours >= 24) {
             long days = hours / 24;
             long remainingHours = hours % 24;
-            BigDecimal dailyCost = vehicle.getDailyRate().multiply(BigDecimal.valueOf(days));
-            BigDecimal hourlyCost = vehicle.getHourlyRate().multiply(BigDecimal.valueOf(remainingHours));
+
+            BigDecimal dailyCost = vehicle.getDailyRate()
+                    .multiply(BigDecimal.valueOf(days));
+
+            BigDecimal hourlyCost = vehicle.getHourlyRate()
+                    .multiply(BigDecimal.valueOf(remainingHours));
+
             totalPrice = dailyCost.add(hourlyCost);
+
         } else {
-            totalPrice = vehicle.getHourlyRate().multiply(BigDecimal.valueOf(hours));
+            totalPrice = vehicle.getHourlyRate()
+                    .multiply(BigDecimal.valueOf(hours));
         }
 
-        // 4. Build and Save Booking
+        // 4. Create Booking
         Booking booking = new Booking();
+
         booking.setCustomer(customer);
         booking.setVehicle(vehicle);
         booking.setStartTime(request.getStartTime());
@@ -77,10 +88,14 @@ public class BookingService {
     }
 
     public Booking updateBookingStatus(Long bookingId, BookingStatus status) {
+
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+                .orElseThrow(() ->
+                        new RuntimeException("Booking not found with ID: "
+                                + bookingId));
 
         booking.setStatus(status);
+
         return bookingRepository.save(booking);
     }
 }
