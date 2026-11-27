@@ -29,24 +29,31 @@ public class SecurityConfig {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                                        "Unauthorized"))
+                                response.sendError(
+                                        HttpServletResponse.SC_UNAUTHORIZED,
+                                        "Unauthorized"
+                                )
+                        )
                         .accessDeniedHandler((request, response, accessDeniedException) ->
-                                response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                                        "Forbidden"))
+                                response.sendError(
+                                        HttpServletResponse.SC_FORBIDDEN,
+                                        "Forbidden"
+                                )
+                        )
                 )
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Public authentication endpoints
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/v1/auth/register",
@@ -55,11 +62,49 @@ public class SecurityConfig {
                                 "/api/v1/auth/reset-password"
                         ).permitAll()
 
+                        // Public vehicle browsing
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/vehicles/**"
                         ).permitAll()
 
+                        // Vendor profile creation
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/vendors/profile"
+                        ).hasRole("VENDOR_ADMIN")
+
+                        // Vendor can view their own profile
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/vendors/profile"
+                        ).hasRole("VENDOR_ADMIN")
+
+                        // Customer and system admin can create bookings
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/bookings"
+                        ).hasAnyRole("CUSTOMER", "SYSTEM_ADMIN")
+
+                        // Customer and system admin can view their bookings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/bookings/my-bookings"
+                        ).hasAnyRole("CUSTOMER", "SYSTEM_ADMIN")
+
+                        // Vendor admin and system admin can view all bookings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/bookings"
+                        ).hasAnyRole("VENDOR_ADMIN", "SYSTEM_ADMIN")
+
+                        // Vendor admin and system admin can update booking status
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/v1/bookings/*/status"
+                        ).hasAnyRole("VENDOR_ADMIN", "SYSTEM_ADMIN")
+
+                        // All remaining endpoints require authentication
                         .anyRequest().authenticated()
                 )
 
