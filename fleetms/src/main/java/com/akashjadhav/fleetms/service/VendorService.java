@@ -7,6 +7,7 @@ import com.akashjadhav.fleetms.model.User;
 import com.akashjadhav.fleetms.model.VendorProfile;
 import com.akashjadhav.fleetms.repository.VendorRepository;
 import org.springframework.stereotype.Service;
+import com.akashjadhav.fleetms.dto.VendorProfileResponse;
 
 import java.util.List;
 
@@ -54,6 +55,24 @@ public class VendorService {
                 .orElseThrow(() -> new RuntimeException(
                         "Vendor profile not found!"));
     }
+
+
+    public VendorProfileResponse convertToResponse(VendorProfile profile) {
+
+        VendorProfileResponse response = new VendorProfileResponse();
+
+        response.setId(profile.getId());
+        response.setBusinessName(profile.getBusinessName());
+        response.setAddress(profile.getAddress());
+        response.setCity(profile.getCity());
+        response.setPincode(profile.getPincode());
+        response.setContactPhone(profile.getContactPhone());
+        response.setContactEmail(profile.getContactEmail());
+        response.setVerified(profile.isVerified());
+
+        return response;
+    }
+
 
 
     public VendorProfile getVendorByEmail(String email) {
